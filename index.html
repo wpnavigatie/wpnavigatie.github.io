@@ -71,13 +71,7 @@ h1 {
 		  </svg>
 		</div>
     </div>
-
-
-
   </div>
-
-
-
 
 <script>
 const x = document.getElementById("location");
@@ -175,6 +169,7 @@ function onHeadingChange(event)
 function watchLocation() {
   if (isIOS) {
     startBtn.style.display = 'block';
+	startCompass();
     startBtn.addEventListener("click", startCompass);
   } else
 	window.addEventListener("deviceorientationabsolute", onHeadingChange);
@@ -190,10 +185,10 @@ function watchLocation() {
 }
 
 function startCompass() {
-    startBtn.style.display = 'none';
     DeviceOrientationEvent.requestPermission()
       .then((response) => {
         if (response === "granted") {
+		  startBtn.style.display = 'none';
           window.addEventListener("deviceorientation", onHeadingChange, true);
         } else {
           x.innerHTML = "Geen toegang tot kompas gegeven";
