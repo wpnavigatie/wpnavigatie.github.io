@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.container {
+  padding: 5rem 1rem 8rem 1rem;
+  overflow: hidden;
+
+  height: 100%;
+  transition: -webkit-transform 0.5s ease-out 0s;
+  transition: transform 0.5s ease-out 0s;
+}
+
+.compass {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.compass__rose {
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+}
+
+.compass__rose__dial {
+  height: 100%;
+  width: 100%;
+}
+
+.compass__pointer {
+height: 100%;
+width: 100%;
+}
+
+h1 {
+  font-size: 80px;
+}
+</style>
+</head>
+<body onLoad="watchLocation()">
+<p id="location">Laden...</p>
+<p id="heading"></p>
+  <div class="container">
+
+    <div class="compass">
+        <svg class="compass__rose__dial" viewBox="0 0 130 130" version="1.1" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="65" cy="65" r="56" stroke="black" stroke-width="1" fill="none" />
+        </svg>
+
+		<div id="rose" class="compass__rose">
+		  <svg class="compass__pointer" viewBox="0 0 130 130" version="1.1" xmlns="http://www.w3.org/2000/svg">
+			<polyline points="60,60  70,60  65,15" fill="#b60000"/>
+			<circle cx="65" cy="65" r="7" stroke="#b60000" stroke-width="7" fill="none" />
+		  </svg>
+		</div>
+    </div>
+
+
+
+  </div>
+
+
+
+
+<script>
+const x = document.getElementById("location");
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const goal_lat = urlParams.get('lat')
+const goal_long = urlParams.get('long')
+const debug = urlParams.get('debug')
+var cur_lat = 0;
+var cur_long = 0;
+var rose = document.getElementById("rose");
+
+function dist_between(lat1,long1,lat2,long2){var e=Math.cos;return Math.floor(12742000*Math.asin(Math.sqrt(.5-e((lat2-lat1)*.017453292519943295)/2+e(.017453292519943295*lat1)*e(.017453292519943295*lat2)*(1-e((long2-long1)*.017453292519943295))/2)))}
+function get_angle(lat1,long1,lat2,long2) {
+	var dy = lat2 - lat1;
+	var dx = Math.cos(lat1)*(long2 - long1);
+
+	var angle = Math.atan2(dy, dx) / Math.PI * 180;
+	if (angle < 0)
+		angle += 360;
+	return angle;
+}
+
+function getBrowserOrientation() {
+    var orientation;
+    if (screen.orientation && screen.orientation.type) {
+      orientation = screen.orientation.type;
+    } else {
+      orientation = screen.orientation ||
+                    screen.mozOrientation ||
+                    screen.msOrientation;
+    }
+	return orientation;
+}
+
+function onHeadingChange(event)
+{
+    var defaultOrientation;
+    if (cur_lat != 0 && cur_long != 0) {
+	    var heading = event.alpha;
+		if (typeof event.webkitCompassHeading !== "undefined") {
+		  heading = event.webkitCompassHeading; //iOS non-standard
+		}
+		var orientation = getBrowserOrientation();
+		if (typeof heading !== "undefined" && heading !== null) { // && typeof orientation !== "undefined") {
+		  var adjustment = 0;
+		  var phase_adj = 0;
+		    if (screen.width > screen.height) {
+				defaultOrientation = "landscape";
+			  } else {
+				defaultOrientation = "portrait";
+			  }
+		  if (defaultOrientation === "landscape") {
+			adjustment -= 90;
+		  }
+		  if (typeof orientation !== "undefined") {
+			var currentOrientation = orientation.split("-");
+			if (defaultOrientation !== currentOrientation[0]) {
+			  if (defaultOrientation === "landscape") {
+				adjustment -= 270;
+			  } else {
+				adjustment -= 90;
+			  }
+			}
+			if (currentOrientation[1] === "secondary") {
+			  adjustment -= 180;
+			}
+		  }
+		  var phase = heading + adjustment;
+		  var angle = phase - get_angle(cur_lat, cur_long, goal_lat, goal_long);
+		  while (angle < 0)
+			angle += 360;
+		  if (debug)
+			document.getElementById("heading").innerHTML = "phase screen: " + phase + ", heading: " + heading + "angle: " + get_angle(cur_lat, cur_long, goal_lat, goal_long);
+		  if (typeof rose.style.transform !== "undefined") {
+			rose.style.transform = "rotateZ(" + angle + "deg)";
+		  } else if (typeof rose.style.webkitTransform !== "undefined") {
+			rose.style.webkitTransform = "rotateZ(" + angle + "deg)";
+		  }
+
+        }
+	}
+    
+}
+
+function watchLocation() {
+  window.addEventListener("deviceorientation", onHeadingChange);
+  if (navigator.geolocation) {
+	  navigator.geolocation.watchPosition(showPosition, showError, {
+		enableHighAccuracy: true,
+		maximumAge: 1000,
+		timeout: 30000
+	  });    
+  } else { 
+    x.innerHTML = "Geen locatietoegang ondersteund op dit apparaat";
+  }
+}
+
+function showPosition(position) {
+  cur_lat = position.coords.latitude;
+  cur_long = position.coords.longitude;
+  var dist = dist_between(position.coords.latitude, position.coords.longitude, goal_lat, goal_long);
+  if (debug) {
+	  x.innerHTML = "Latitude: " + position.coords.latitude + 
+	  "<br>Longitude: " + position.coords.longitude +
+	  "<br>Latitude goal: " + goal_lat +
+	  "<br>Longitude goal: " + goal_long +
+	  "<br>Distance: " + dist_between(position.coords.latitude, position.coords.longitude, goal_lat, goal_long) + " m" +
+	  "<br>Angle: " + get_angle(cur_lat, cur_long, goal_lat, goal_long);
+  } else {
+      x.innerHTML = "<center><h1>Afstand: " + dist + "m</h1></center>";
+  }
+}
+
+function showError(error) {
+  switch(error.code) {
+    case error.PERMISSION_DENIED:
+      x.innerHTML = "Geen toegang tot locatie"
+      break;
+    case error.POSITION_UNAVAILABLE:
+      x.innerHTML = "Locatie niet beschikbaar"
+      break;
+    case error.TIMEOUT:
+      x.innerHTML = "Locatie timeout"
+      break;
+    case error.UNKNOWN_ERROR:
+      x.innerHTML = "Error"
+      break;
+  }
+}
+</script>
+
+</body>
+</html>
+
