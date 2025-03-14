@@ -140,7 +140,7 @@ function onHeadingChange(event)
 			}
 		  }
 		  var phase = heading + adjustment;
-		  var angle = phase - get_angle(cur_lat, cur_long, goal_lat, goal_long);
+		  var angle = phase + 90 - get_angle(cur_lat, cur_long, goal_lat, goal_long);
 		  while (angle < 0)
 			angle += 360;
 		  if (debug)
