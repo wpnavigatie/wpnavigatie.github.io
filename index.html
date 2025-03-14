@@ -142,7 +142,7 @@ function onHeadingChange(event)
 		  var phase = heading + adjustment;
 		  var angle = phase + 90 - get_angle(cur_lat, cur_long, goal_lat, goal_long);
 		  if (isIOS)
-			angle = get_angle(cur_lat, cur_long, goal_lat, goal_long) - phase + 90;
+			angle = get_angle(cur_lat, cur_long, goal_lat, goal_long) - phase - 90;
 		  while (angle < 0)
 			angle += 360;
 		while (angle > 360)
