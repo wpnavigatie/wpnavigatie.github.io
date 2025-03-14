@@ -44,6 +44,7 @@ h1 {
 <body onLoad="watchLocation()">
 <p id="location">Laden...</p>
 <p id="heading"></p>
+<button id="start-btn" style="display: none;">Start compass</button>
   <div class="container">
 
     <div class="compass">
@@ -68,6 +69,7 @@ h1 {
 
 <script>
 const x = document.getElementById("location");
+const startBtn = document.getElementById("start-btn");
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const goal_lat = urlParams.get('lat')
@@ -76,6 +78,10 @@ const debug = urlParams.get('debug')
 var cur_lat = 0;
 var cur_long = 0;
 var rose = document.getElementById("rose");
+const isIOS = !(
+  navigator.userAgent.match(/(iPod|iPhone|iPad)/) &&
+  navigator.userAgent.match(/AppleWebKit/)
+);
 
 function dist_between(lat1,long1,lat2,long2){var e=Math.cos;return Math.floor(12742000*Math.asin(Math.sqrt(.5-e((lat2-lat1)*.017453292519943295)/2+e(.017453292519943295*lat1)*e(.017453292519943295*lat2)*(1-e((long2-long1)*.017453292519943295))/2)))}
 function get_angle(lat1,long1,lat2,long2) {
@@ -151,7 +157,11 @@ function onHeadingChange(event)
 }
 
 function watchLocation() {
-  window.addEventListener("deviceorientation", onHeadingChange);
+  if (isIOS) {
+    startBtn.style.display = 'block';
+    startBtn.addEventListener("click", startCompass);
+  } else
+	window.addEventListener("deviceorientationabsolute", onHeadingChange);
   if (navigator.geolocation) {
 	  navigator.geolocation.watchPosition(showPosition, showError, {
 		enableHighAccuracy: true,
@@ -161,6 +171,19 @@ function watchLocation() {
   } else { 
     x.innerHTML = "Geen locatietoegang ondersteund op dit apparaat";
   }
+}
+
+function startCompass() {
+    startBtn.style.display = 'none';
+    DeviceOrientationEvent.requestPermission()
+      .then((response) => {
+        if (response === "granted") {
+          window.addEventListener("deviceorientation", onHeadingChange, true);
+        } else {
+          x.innerHTML = "Geen toegang tot kompas gegeven";
+        }
+      })
+      .catch(() => x.innerHTML = "kompas is niet ondersteund";);
 }
 
 function showPosition(position) {
