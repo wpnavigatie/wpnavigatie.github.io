@@ -78,7 +78,7 @@ const debug = urlParams.get('debug')
 var cur_lat = 0;
 var cur_long = 0;
 var rose = document.getElementById("rose");
-const isIOS = !(
+const isIOS = (
   navigator.userAgent.match(/(iPod|iPhone|iPad)/) &&
   navigator.userAgent.match(/AppleWebKit/)
 );
@@ -183,7 +183,6 @@ function startCompass() {
           x.innerHTML = "Geen toegang tot kompas gegeven";
         }
       })
-      .catch(() => x.innerHTML = "kompas is niet ondersteund";);
 }
 
 function showPosition(position) {
