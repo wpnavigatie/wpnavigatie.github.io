@@ -9,6 +9,8 @@ input { display: table-cell; }
 </style>
 </head>
 <body>
+<div id="error" ></div>
+<button id="button" onClick="getlocation()" >Huidige locatie</button>
 <div id="form">
 <p>
 <label for="lat">Latitude:</label>
@@ -27,6 +29,36 @@ input { display: table-cell; }
 <script type="text/javascript">
 function create_qr() {
 	new QRCode(document.getElementById("qrcode"), "https://wpnavigatie.github.io/?lat=" + document.getElementById("lat").value.replace(',', '.') + "&long=" + document.getElementById("long").value.replace(',', '.'));
+}
+
+function getlocation() {
+	navigator.geolocation.getCurrentPosition(showPosition, showError, {
+			enableHighAccuracy: true,
+			maximumAge: 1000,
+			timeout: 30000
+		  }); 
+}
+
+function showPosition(position) {
+  document.getElementById("lat").value = position.coords.latitude;
+  document.getElementById("long").value = position.coords.longitude;
+}
+
+function showError(error) {
+  switch(error.code) {
+    case error.PERMISSION_DENIED:
+      document.getElementById("error").innerHTML = "<h2>Geen toegang tot locatie. Geef deze site locatie toegang om door te gaan.</h2>"
+      break;
+    case error.POSITION_UNAVAILABLE:
+      document.getElementById("error").innerHTML = "<h2>Locatie niet beschikbaar</h2>"
+      break;
+    case error.TIMEOUT:
+      document.getElementById("error").innerHTML = "<h2>Locatie niet gevonden</h2>"
+      break;
+    case error.UNKNOWN_ERROR:
+      document.getElementById("error").innerHTML = "Er is een fout opgetreden"
+      break;
+  }
 }
 </script>
 </body>
