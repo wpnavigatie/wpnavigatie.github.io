@@ -191,7 +191,7 @@ function startCompass() {
 		  startBtn.style.display = 'none';
           window.addEventListener("deviceorientation", onHeadingChange, true);
         } else {
-          x.innerHTML = "Geen toegang tot kompas gegeven";
+          x.innerHTML = "<h2>Geen toegang tot kompas gegeven. Geef toegang tot kompas om door te gaan.</h2>";
         }
       })
 }
@@ -215,16 +215,16 @@ function showPosition(position) {
 function showError(error) {
   switch(error.code) {
     case error.PERMISSION_DENIED:
-      x.innerHTML = "Geen toegang tot locatie"
+      x.innerHTML = "<h2>Geen toegang tot locatie. Geef deze site locatie toegang om door te gaan.</h2>"
       break;
     case error.POSITION_UNAVAILABLE:
-      x.innerHTML = "Locatie niet beschikbaar"
+      x.innerHTML = "<h2>Locatie niet beschikbaar</h2>"
       break;
     case error.TIMEOUT:
-      x.innerHTML = "Locatie timeout"
+      x.innerHTML = "<h2>Locatie niet gevonden</h2>"
       break;
     case error.UNKNOWN_ERROR:
-      x.innerHTML = "Error"
+      x.innerHTML = "Er is een fout opgetreden"
       break;
   }
 }

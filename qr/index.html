@@ -1,0 +1,33 @@
+<html>
+<head>
+<script type="text/javascript" src="qrcode.js" ></script>
+<style>
+.form  { display: table;      }
+p     { display: table-row;  }
+label { display: table-cell; }
+input { display: table-cell; }
+</style>
+</head>
+<body>
+<div id="form">
+<p>
+<label for="lat">Latitude:</label>
+<input id="lat" type="text" />
+</p>
+<p>
+<label for="long">Longitude:</label>
+<input id="long" type="text" />
+</p>
+<p>
+<button id="button" onClick="create_qr()" >Genereer QR</button>
+</p>
+</div>
+<br /><br />
+<div id="qrcode"></div>
+<script type="text/javascript">
+function create_qr() {
+	new QRCode(document.getElementById("qrcode"), "https://wpnavigatie.github.io/?lat=" + document.getElementById("lat").value.replace(',', '.') + "&long=" + document.getElementById("long").value.replace(',', '.'));
+}
+</script>
+</body>
+</html>
