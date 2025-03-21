@@ -91,10 +91,10 @@ const isIOS = (
 
 function dist_between(lat1,long1,lat2,long2){var e=Math.cos;return Math.floor(12742000*Math.asin(Math.sqrt(.5-e((lat2-lat1)*.017453292519943295)/2+e(.017453292519943295*lat1)*e(.017453292519943295*lat2)*(1-e((long2-long1)*.017453292519943295))/2)))}
 function get_angle(lat1,long1,lat2,long2) {
-	var dy = lat2 - lat1;
-	var dx = Math.cos(lat1)*(long2 - long1);
+	var y = Math.sin(long2 - long1) * Math.cos(lat2);
+	var x = Math.cos(lat1)*Math.sin(lat2) - Math.sin(lat1)*Math.cos(lat2)*Math.cos(long2-long1);
 
-	var angle = Math.atan2(dy, dx) / Math.PI * 180;
+	var angle = Math.atan2(y, x) * 180 / Math.PI;
 	if (angle < 0)
 		angle += 360;
 	return angle;
@@ -149,10 +149,9 @@ function onHeadingChange(event)
 		  var angle = phase + 90 - get_angle(cur_lat, cur_long, goal_lat, goal_long);
 		  if (isIOS)
 			angle = -1 * phase + 90 - get_angle(cur_lat, cur_long, goal_lat, goal_long);
-		  while (angle < 0)
+		  if (angle < 0)
 			angle += 360;
-		while (angle > 360)
-			angle += 360;
+		  angle = angle % 360;
 		  if (debug)
 			document.getElementById("heading").innerHTML = "phase screen: " + phase + ", heading: " + heading + "angle: " + get_angle(cur_lat, cur_long, goal_lat, goal_long);
 		  if (typeof rose.style.transform !== "undefined") {
