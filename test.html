@@ -73,11 +73,8 @@ h1 {
     </div>
   </div>
 <p id="hints"></p>
+<script src="hints.js"></script>
 <script>
-
-const hints = new Map();
-hints.set('10;10', 'hint1');
-hints.set('20;20', 'hint2');
 
 const x = document.getElementById("location");
 const h = document.getElementById("hints");
@@ -216,7 +213,7 @@ function showPosition(position) {
   } else {
       x.innerHTML = "<center><h1>Afstand: " + dist + "m</h1></center>";
   }
-  if (hints.has(goal_lat + ";" + goal_long) && h.innerHTML == "") {
+  if (dist < 10 && hints.has(goal_lat + ";" + goal_long) && h.innerHTML == "") {
 	  h.innerHTML = "<button style = 'font-size: 40px' onClick='h.innerHTML = \"<h2>" + hints.get(goal_lat + ";" + goal_long) + "</h2>\"'>Hint</button>";
   }
 }
