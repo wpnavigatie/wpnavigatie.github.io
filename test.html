@@ -216,8 +216,8 @@ function showPosition(position) {
   } else {
       x.innerHTML = "<center><h1>Afstand: " + dist + "m</h1></center>";
   }
-  if (hints.has(goal_lat + ";" + goal_long)) {
-	  h.innerHTML = "<button onClick='h.innerHTML = \"<h3>" + hints.get(goal_lat + ";" + goal_long) + "</h3>\"'>Hint</button>";
+  if (hints.has(goal_lat + ";" + goal_long) && h.innerHTML == "") {
+	  h.innerHTML = "<button style = 'font-size: 40px' onClick='h.innerHTML = \"<h2>" + hints.get(goal_lat + ";" + goal_long) + "</h2>\"'>Hint</button>";
   }
 }
 
