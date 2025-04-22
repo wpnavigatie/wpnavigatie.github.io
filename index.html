@@ -72,9 +72,12 @@ h1 {
 		</div>
     </div>
   </div>
-
+<p id="hints"></p>
+<script src="hints.js"></script>
 <script>
+
 const x = document.getElementById("location");
+const h = document.getElementById("hints");
 const startBtn = document.getElementById("start-btn");
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
@@ -209,6 +212,9 @@ function showPosition(position) {
 	  "<br>Angle: " + get_angle(cur_lat, cur_long, goal_lat, goal_long);
   } else {
       x.innerHTML = "<center><h1>Afstand: " + dist + "m</h1></center>";
+  }
+  if (dist < 10 && hints.has(goal_lat + ";" + goal_long) && h.innerHTML == "") {
+	  h.innerHTML = "<button style = 'font-size: 40px' onClick='h.innerHTML = \"<h2>" + hints.get(goal_lat + ";" + goal_long) + "</h2>\"'>Hint</button>";
   }
 }
 
